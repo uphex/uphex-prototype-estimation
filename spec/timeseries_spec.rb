@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'date'
-require "./lib/timeseries.rb"
+require "./lib/uphex-estimation"
 
 describe UpHex::Prediction::TimeSeries do
   describe "source data validation" do
@@ -90,7 +90,7 @@ describe UpHex::Prediction::TimeSeries do
     end
     
     it "rejects an unknown or bad interval key" do
-      expect{UpHex::Prediction::TimeSeries.new(sample_data, {:years => 1})}.to raise_error(ArgumentError,/invalid period/i)
+      expect{UpHex::Prediction::TimeSeries.new(sample_data, {:years => 1})}.to raise_error(NoMethodError)
     end        
 
     it "rejects an unknown or bad interval value (non-coercable numeric)" do
@@ -161,30 +161,29 @@ describe UpHex::Prediction::TimeSeries do
       ts = UpHex::Prediction::TimeSeries.new(samp, {:days => 1})
       
       offset = 2
-      subset = ts.at(offset)
+      subset = ts[offset]
       expect(subset[:value]).to eq samp[offset][:value]      
     end 
 
-    it "returns an array of  source data when calling at(index) with a range" do
+    it "returns an array of source data when calling [index] with a range" do
       ts = UpHex::Prediction::TimeSeries.new(samp, {:days => 1})
       
       target = (11..19)
       offset = target.begin
-      subset = ts.at(target)
+      subset = ts[target]
 
       expect(subset.length).to eq target.to_a.length      
     end 
 
 
     
-    it "returns nil when calling at with anything besides an integer or range" do
+    it "raise TypeError when calling at with a non-numeric type" do
       ts = UpHex::Prediction::TimeSeries.new(samp, {:days => 1})
       
-      expect(ts.at({:a => "b"})).to eq nil
-      expect(ts.at(3.1)).to eq nil
-      expect(ts.at("fourtyfour")).to eq nil
-      expect(ts.at("6")).to eq nil
-      expect(ts.at(:a)).to eq nil
+      expect { ts[{:a => "b"}] }.to raise_error(TypeError)
+      expect {ts["fourtyfour"] }.to raise_error(TypeError)
+      expect {ts["6"]}.to raise_error(TypeError)
+      expect {ts[:a]}.to raise_error(TypeError)
     end
   end
   

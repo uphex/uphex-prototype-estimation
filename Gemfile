@@ -1,4 +1,4 @@
 source 'https://rubygems.org/'
-gem 'rspec'
 
-gem 'holt_winters'
+## TODO: change to github link
+gem 'uphex-estimation', :path => '.'

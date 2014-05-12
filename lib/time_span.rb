@@ -40,20 +40,7 @@ module UpHex
         period = h.keys[0]
         value = h[period]
                     
-        case period
-        when :seconds
-          self.from_seconds(value)
-        when :hours
-          self.from_hours(value)
-        when :minutes
-          self.from_minutes(value)
-        when :days
-          self.from_days(value)
-        when :weeks
-          self.from_weeks(value)
-        else
-          throw ArgumentError.new("Invalid period (#{period})")
-        end
+        send("from_#{period.to_sym}", value)
       end
   
       def advance(t0)

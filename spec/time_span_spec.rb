@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'date'
-require "./lib/time_span.rb"
+
+require "uphex-estimation"
 
 describe UpHex::Prediction::TimeSpan do
       
@@ -137,7 +138,7 @@ describe UpHex::Prediction::TimeSpan do
     end
     
     it "handles hases with bad keys" do
-      expect {UpHex::Prediction::TimeSpan.from_hash(:test => "data")}.to raise_error(ArgumentError,/invalid period/i)
+      expect {UpHex::Prediction::TimeSpan.from_hash(:test => "data")}.to raise_error(NoMethodError)
     end
     
     it "handles hashes with bad values (non-numeric coercable)" do
