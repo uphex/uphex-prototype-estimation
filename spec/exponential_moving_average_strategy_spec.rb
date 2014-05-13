@@ -27,11 +27,9 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
       forecast_periods = 3
       # compute EMA on records 0..(5 to 10)
       range = Range.new(0, 5+prng.rand(5))
-      results = ema.forecast(forecast_periods,:period_count => 15, :interval_ratio => 5, :range => range)
+      results = ema.forecast(forecast_periods, :range => range,:model => { :period_count => 15, :interval_ratio => 5})
       
-			diffs = []
-
-      expect(results.length).to eq forecast_periods
+			expect(results.length).to eq forecast_periods
       offset = range.end + 1
 
       results.each_with_index do |r, index|
@@ -39,7 +37,7 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
         # expect the % difference between the predicted and expected value to fall within our error tolerence
         diff = (r[:forecast] - t[0]).abs / t[0]
         expect(diff).to be <= error_tolerence
-				diffs << diff
+
         diff = (r[:low] - t[1]).abs / t[1]
         expect(diff).to be <= error_tolerence
 

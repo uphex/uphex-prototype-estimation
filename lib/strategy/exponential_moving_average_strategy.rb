@@ -11,7 +11,8 @@ module UpHex
 	    end
 
 	    def merge_default_options(opts)
-				{:period_count => 365.0, :range => (0..@timeseries.length), :interval_ratio => 3.0}.merge(opts)
+				model = {:period_count => 365.0, :interval_ratio => 3.0}.merge((opts[:model] || {}))
+				{:model => model, :range => (0..@timeseries.length)}.merge(opts)
 	    end
     
 			
@@ -44,9 +45,9 @@ module UpHex
 
 				foreward = foreward.to_i
 				
-				period_count = opts[:period_count].to_f
+				period_count = opts[:model][:period_count].to_f
 				range = opts[:range]
-				interval_ratio = opts[:interval_ratio]
+				interval_ratio = opts[:model][:interval_ratio]
 				
 	      results = []
       
