@@ -1,7 +1,7 @@
-require 'timeseries'
-require 'prediction'
-require 'strategy'
-require 'exponential_moving_average_strategy'
+require 'timeseries/timeseries'
+require 'strategy/prediction'
+require 'strategy/strategy'
+require 'strategy/exponential_moving_average_strategy'
 
 module UpHex
 	module Prediction

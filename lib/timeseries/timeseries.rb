@@ -1,6 +1,6 @@
 require 'forwardable'
-require 'time_span'
-require 'time_series_validator'
+require 'timeseries/time_span'
+require 'timeseries/time_series_validator'
 
 module UpHex
   module Prediction
