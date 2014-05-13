@@ -15,7 +15,11 @@ module UpHex
 	    end
     
 			
-			def next_prediction(last_prediction, residuals, current_prediction, alpha, interval_ratio)
+			def perform_prediction(alpha, interval_ratio, last_prediction, residuals, date, value )
+				
+				# create a new prediction container for the next date,value pair
+				current_prediction = Prediction.new(date, value)
+				
 				current_prediction.predicted_value = alpha*current_prediction.actual_value + (1.0-alpha) * last_prediction.predicted_value
         residual = (current_prediction.predicted_value - current_prediction.actual_value).abs
 				
@@ -28,9 +32,11 @@ module UpHex
 				current_prediction.low_range = current_prediction.predicted_value - interval_ratio * mean_residual
 				current_prediction.high_range = current_prediction.predicted_value + interval_ratio * mean_residual                 
 
+				# set the outlier flag based on the range values
 				current_prediction.outlier = (current_prediction.predicted_value < current_prediction.low_range || 
 																			current_prediction.predicted_value > current_prediction.high_range)
 				
+				return residuals, current_prediction
 			end
 			
 			def forecast(foreward, opts = {})
@@ -49,13 +55,10 @@ module UpHex
 	      # extend subset range to include forecast count (foreward)
 	      extended_range = Range.new(range.begin, range.end+foreward)
       
-	      # subset based on the provided range plus the periods forward
-	      # defaults to the full range of data
+	      # subset based on the provided range plus the periods forward. defaults to the full range of data
+				# Ruby is copy-on-write so if we dont change anything inside subset[] then we aren't duplicating the
+				# entire timeseries
 	      subset = @timeseries[extended_range]
-				
-				# since the EMA only uses the current and last values we can avoid duplicating the
-				# entire subset in memory
-				working = []
 				
 				# initial prediction
 				last_prediction = Prediction.new(subset[0][:date], subset[0][:value])
@@ -66,10 +69,10 @@ module UpHex
 				residuals = []
 				
 				1.upto(subset.length-1) do |index|
-					current = Prediction.new(subset[index][:date], subset[index][:value])
+					#current = Prediction.new(subset[index][:date], subset[index][:value])
 								
-					#	produce the next predicted value and the outlier range
-					next_prediction(last_prediction, residuals, current, alpha, interval_ratio)
+					#	produce the next Prediction
+					residuals, current = perform_prediction(alpha, interval_ratio, last_prediction, residuals, subset[index][:date],subset[index][:value])
 					
 					# replace the last_prediction with the current
 					last_prediction = current
@@ -78,7 +81,7 @@ module UpHex
 					forecasts << current.dup if index > range.end
 				end
 				
-				# map the forecasts to 
+				# map the forecasts to the hashed form
 				forecasts.map {|p| {:date => p.date, :forecast => p.predicted_value, :low => p.low_range, :high => p.high_range}}
 				
 			end

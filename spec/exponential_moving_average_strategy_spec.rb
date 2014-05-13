@@ -3,26 +3,27 @@ require "uphex-estimation"
 
 describe UpHex::Prediction::ExponentialMovingAverageStrategy do
 
-  let(:timeseries) { UpHex::Prediction::TimeSeries.new(sourcedata, {:days => 1})}
-  let(:ema) { described_class.new(timeseries)}
 
-  describe "exponential moving average initialization" do
+  context "exponential moving average initialization" do
 
     it "needs two or more source data rows" do
       ts = UpHex::Prediction::TimeSeries.new(single_data_set, {:days => 1})
-      expect {UpHex::Prediction::ExponentialMovingAverageStrategy.new(ts)}.to raise_error(ArgumentError, /invalid data set length/i)
+      expect {described_class.new(ts)}.to raise_error(ArgumentError, /invalid data set length/i)
     end            
   end
   
 
-  describe "exponential moving average forecast" do
+  context "exponential moving average forecast" do
+
+	  let(:timeseries) { UpHex::Prediction::TimeSeries.new(sourcedata, {:days => 1})}
+	  let(:ema) { UpHex::Prediction::ExponentialMovingAverageStrategy.new(timeseries)}
     
     let (:prng) { Random.new }
     let (:truth) { truthdata() }
 
     error_tolerence = 0.001
 
-    it "performs a 15-day EMA with interval ratio 5, a number of periods into the future" do
+    it "performs a 15-day EMA with interval ratio 5, a variable number of periods into the future" do
       forecast_periods = 3
       # compute EMA on records 0..(5 to 10)
       range = Range.new(0, 5+prng.rand(5))
