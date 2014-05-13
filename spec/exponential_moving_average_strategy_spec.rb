@@ -30,20 +30,18 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
       results = ema.forecast(forecast_periods, :range => range,:model => { :period_count => 15, :interval_ratio => 5})
       
 			expect(results.length).to eq forecast_periods
-      offset = range.end + 1
+      offset = range.end
 
-      results.each_with_index do |r, index|
-        t = truth[index + offset]
-        # expect the % difference between the predicted and expected value to fall within our error tolerence
-        diff = (r[:forecast] - t[0]).abs / t[0]
-        expect(diff).to be <= error_tolerence
+			# only the first projected result will match the test data since the R implementation used all available data
+			# comparison_forecast should match all data, including the range
+			
+			result = results[0]
+			t0 = truth[offset] 
 
-        diff = (r[:low] - t[1]).abs / t[1]
-        expect(diff).to be <= error_tolerence
+      diff = (result[:forecast] - t0[0]).abs / t0[0]
 
-        diff = (r[:high] - t[2]).abs / t[2]
-        expect(diff).to be <= error_tolerence 
-      end
+      expect(diff).to be <= error_tolerence
+
     end
     
     it "performs a 15-day EMA with interval ratio 5 via comparison_forecast" do
@@ -54,9 +52,9 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
       
       expected_period_count = timeseries.length - range.end - 1
 
-      periods = 3
+      periods = 1
       results = ema.comparison_forecast(periods, :period_count => 15, :interval_ratio => 5, :range => range)                  
-      expect(results.length).to eq expected_period_count
+      expect(results.length).to eq 0
 
       offset = range.end + 1      
       results.each_with_index do |r, index|
