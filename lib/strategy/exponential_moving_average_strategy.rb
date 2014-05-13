@@ -2,7 +2,7 @@ require "uphex-estimation"
 
 module UpHex
 	module Prediction
-	  class ExponentialMovingAverageStrategy < UpHex::Prediction::Strategy
+	  class ExponentialMovingAverageStrategy < Strategy
     
 	    def initialize(ts)
 	      super(ts)
