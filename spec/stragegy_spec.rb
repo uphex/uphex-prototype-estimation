@@ -5,17 +5,17 @@ describe UpHex::Prediction::Strategy do
 	
 	context "initialization" do
 	  it "does not accept a nil time series" do
-	    expect {UpHex::Prediction::Strategy.new(nil).comparison_forecast}.to raise_error(ArgumentError, /Invalid timeseries/)
+	    expect {described_class.new(nil).comparison_forecast}.to raise_error(ArgumentError, /Invalid timeseries/)
 	  end
   end
 	
   context "strategy interface" do
 	  it "throws an exception on forecast()" do
-	    expect{UpHex::Prediction::Strategy.new(timeseries).forecast}.to raise_error(RuntimeError)
+	    expect{described_class.new(timeseries).forecast}.to raise_error(RuntimeError)
 	  end
 
 	  it "throws an exception on comparison_forecast()" do
-	    expect {UpHex::Prediction::Strategy.new(timeseries).comparison_forecast}.to raise_error(RuntimeError)
+	    expect {described_class.new(timeseries).comparison_forecast}.to raise_error(RuntimeError)
 	  end
   end
 
