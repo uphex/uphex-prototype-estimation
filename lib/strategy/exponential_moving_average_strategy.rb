@@ -50,8 +50,6 @@ module UpHex
 				range = opts[:range]
 				interval_ratio = opts[:model][:interval_ratio].to_f
 
-	      results = []
-      
 	      alpha = 2.0/(period_count+1.0)
       
 	      # subset based on the provided range. defaults to the full range of data
@@ -66,7 +64,7 @@ module UpHex
 				
 				# the actual forecasts
 				forecasts = []
-				debug = true
+
 				# perform EMA for the existing data
 				1.upto(subset.length-1) do |index|
 					#	produce the next Prediction
