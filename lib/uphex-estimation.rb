@@ -1,6 +1,7 @@
 require 'timeseries'
-require 'strategy'
 require 'prediction'
+require 'strategy'
+require 'exponential_moving_average_strategy'
 
 module UpHex
 	module Prediction
