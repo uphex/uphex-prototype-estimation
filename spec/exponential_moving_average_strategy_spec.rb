@@ -47,26 +47,31 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
     it "performs a 15-day EMA with interval ratio 5 via comparison_forecast" do
       
       # compute EMA on records 0..(6 to 16)
-      #range = Range.new(0,6+prng.rand(10))
+
       range = 0..15
       
-      expected_period_count = timeseries.length - range.end - 1
+      foreward = 5
+			expected_forecasts = timeseries.length - range.max - 1 + foreward
+      results = ema.comparison_forecast(foreward, :range => range, :model => {:period_count => 15, :interval_ratio => 5})                  
+      expect(results.length).to eq expected_forecasts
 
-      periods = 1
-      results = ema.comparison_forecast(periods, :period_count => 15, :interval_ratio => 5, :range => range)                  
-      expect(results.length).to eq 0
+			offset = range.max + 1
 
-      offset = range.end + 1      
-      results.each_with_index do |r, index|
+			# only compare forecasts against truthdata
+			# we'll have ``foreward`` extra results at the end with nothing to compare against
+			results.each_with_index do |r, index|
+				# we have nothing to compare our forecasts beyond timeseries.length to, so we skip them
+				break if index+offset >= timeseries.length
+
         t = truth[offset + index ]
         diff = (r[:forecast] - t[0]).abs / t[0]
-        #expect(diff).to be <= error_tolerence     
+        expect(diff).to be <= error_tolerence
         
         diff = (r[:low] - t[1]).abs / t[1]
-        #expect(diff).to be <= error_tolerence
+        expect(diff).to be <= error_tolerence
 
         diff = (r[:high] - t[2]).abs / t[2]
-        #expect(diff).to be <= error_tolerence    
+        expect(diff).to be <= error_tolerence
       end
       
     end
