@@ -15,8 +15,8 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
 
   context "exponential moving average forecast" do
 
-	  let(:timeseries) { UpHex::Prediction::TimeSeries.new(sourcedata, {:days => 1})}
-	  let(:ema) { UpHex::Prediction::ExponentialMovingAverageStrategy.new(timeseries)}
+    let(:timeseries) { UpHex::Prediction::TimeSeries.new(sourcedata, {:days => 1})}
+    let(:ema) { UpHex::Prediction::ExponentialMovingAverageStrategy.new(timeseries)}
     
     let (:prng) { Random.new }
     let (:truth) { truthdata() }
@@ -29,14 +29,14 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
       range = Range.new(0, 5+prng.rand(5))
       results = ema.forecast(forecast_periods, :range => range,:model => { :period_count => 15, :interval_ratio => 5})
       
-			expect(results.length).to eq forecast_periods
+      expect(results.length).to eq forecast_periods
       offset = range.end
 
-			# only the first projected result will match the test data since the R implementation used all available data
-			# comparison_forecast should match all data, including the range
-			
-			result = results[0]
-			t0 = truth[offset] 
+      # only the first projected result will match the test data since the R implementation used all available data
+      # comparison_forecast should match all data, including the range
+      
+      result = results[0]
+      t0 = truth[offset] 
 
       diff = (result[:forecast] - t0[0]).abs / t0[0]
 
@@ -51,17 +51,17 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
       range = 0..15
       
       foreward = 5
-			expected_forecasts = timeseries.length - range.max - 1 + foreward
+      expected_forecasts = timeseries.length - range.max - 1 + foreward
       results = ema.comparison_forecast(foreward, :range => range, :model => {:period_count => 15, :interval_ratio => 5})                  
       expect(results.length).to eq expected_forecasts
 
-			offset = range.max + 1
+      offset = range.max + 1
 
-			# only compare forecasts against truthdata
-			# we'll have ``foreward`` extra results at the end with nothing to compare against
-			results.each_with_index do |r, index|
-				# we have nothing to compare our forecasts beyond timeseries.length to, so we skip them
-				break if index+offset >= timeseries.length
+      # only compare forecasts against truthdata
+      # we'll have ``foreward`` extra results at the end with nothing to compare against
+      results.each_with_index do |r, index|
+        # we have nothing to compare our forecasts beyond timeseries.length to, so we skip them
+        break if index+offset >= timeseries.length
 
         t = truth[offset + index ]
         diff = (r[:forecast] - t[0]).abs / t[0]
