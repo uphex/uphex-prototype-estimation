@@ -11,6 +11,10 @@ module UpHex
         @predicted_value = value
         @outlier = false
       end
+      
+      def outlier?
+        !(@low_range..@high_range).cover? @predicted_value
+      end
     end
   end
 end

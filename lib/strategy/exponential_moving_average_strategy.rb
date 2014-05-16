@@ -30,25 +30,21 @@ module UpHex
         context.residuals << residual        
         mean_residual = context.residual_mean
 
-        # calculate the low and high range for outliers
+        # calculate the low and high range for outlier determination
         current_prediction.low_range = current_prediction.predicted_value - context.interval_ratio * mean_residual
         current_prediction.high_range = current_prediction.predicted_value + context.interval_ratio * mean_residual                 
 
-        # set the outlier flag based on the range values
-        current_prediction.outlier = (current_prediction.predicted_value < current_prediction.low_range || 
-                                      current_prediction.predicted_value > current_prediction.high_range)
-        
         return current_prediction
       end
       
       def forecast(foreward, opts = {})
         opts = merge_default_options(opts)
 
-        foreward = foreward.to_i
+        foreward = foreward
         
-        period_count = opts[:model][:period_count].to_f
+        period_count = opts[:model][:period_count]
         range = opts[:range]
-        interval_ratio = opts[:model][:interval_ratio].to_f
+        interval_ratio = opts[:model][:interval_ratio]
 
         alpha = 2.0/(period_count+1.0)
       
@@ -89,11 +85,11 @@ module UpHex
       def comparison_forecast(foreward, opts = {})
         opts = merge_default_options(opts)
 
-        foreward = foreward.to_i
+        foreward = foreward
 
-        period_count = opts[:model][:period_count].to_f
+        period_count = opts[:model][:period_count]
         range = opts[:range]
-        interval_ratio = opts[:model][:interval_ratio].to_f
+        interval_ratio = opts[:model][:interval_ratio]
 
         alpha = 2.0/(period_count+1.0)
   
