@@ -21,7 +21,7 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
     let (:prng) { Random.new }
     let (:truth) { truthdata() }
 
-    error_tolerence = 0.001
+    error_tolerance = 0.001
 
     it "performs a 15-day EMA with interval ratio 5, a variable number of periods into the future" do
       forecast_periods = 3
@@ -40,7 +40,7 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
 
       diff = (result[:forecast] - t0[0]).abs / t0[0]
 
-      expect(diff).to be <= error_tolerence
+      expect(diff).to be <= error_tolerance
 
     end
     
@@ -65,13 +65,13 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
 
         t = truth[offset + index ]
         diff = (r[:forecast] - t[0]).abs / t[0]
-        expect(diff).to be <= error_tolerence
+        expect(diff).to be <= error_tolerance
         
         diff = (r[:low] - t[1]).abs / t[1]
-        expect(diff).to be <= error_tolerence
+        expect(diff).to be <= error_tolerance
 
         diff = (r[:high] - t[2]).abs / t[2]
-        expect(diff).to be <= error_tolerence
+        expect(diff).to be <= error_tolerance
       end
       
     end
