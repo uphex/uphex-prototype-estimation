@@ -15,62 +15,63 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
 
   context "exponential moving average forecast" do
 
-	  let(:timeseries) { UpHex::Prediction::TimeSeries.new(sourcedata, {:days => 1})}
-	  let(:ema) { UpHex::Prediction::ExponentialMovingAverageStrategy.new(timeseries)}
+    let(:timeseries) { UpHex::Prediction::TimeSeries.new(sourcedata, {:days => 1})}
+    let(:ema) { UpHex::Prediction::ExponentialMovingAverageStrategy.new(timeseries)}
     
     let (:prng) { Random.new }
     let (:truth) { truthdata() }
 
-    error_tolerence = 0.001
+    error_tolerance = 0.001
 
     it "performs a 15-day EMA with interval ratio 5, a variable number of periods into the future" do
       forecast_periods = 3
       # compute EMA on records 0..(5 to 10)
       range = Range.new(0, 5+prng.rand(5))
-      results = ema.forecast(forecast_periods,:period_count => 15, :interval_ratio => 5, :range => range)
+      results = ema.forecast(forecast_periods, :range => range,:model => { :period_count => 15, :interval_ratio => 5})
       
-			diffs = []
-
       expect(results.length).to eq forecast_periods
-      offset = range.end + 1
+      offset = range.end
 
-      results.each_with_index do |r, index|
-        t = truth[index + offset]
-        # expect the % difference between the predicted and expected value to fall within our error tolerence
-        diff = (r[:forecast] - t[0]).abs / t[0]
-        expect(diff).to be <= error_tolerence
-				diffs << diff
-        diff = (r[:low] - t[1]).abs / t[1]
-        expect(diff).to be <= error_tolerence
+      # only the first projected result will match the test data since the R implementation used all available data
+      # comparison_forecast should match all data, including the range
+      
+      result = results[0]
+      t0 = truth[offset] 
 
-        diff = (r[:high] - t[2]).abs / t[2]
-        expect(diff).to be <= error_tolerence 
-      end
+      diff = (result[:forecast] - t0[0]).abs / t0[0]
+
+      expect(diff).to be <= error_tolerance
+
     end
     
     it "performs a 15-day EMA with interval ratio 5 via comparison_forecast" do
       
       # compute EMA on records 0..(6 to 16)
-      #range = Range.new(0,6+prng.rand(10))
+
       range = 0..15
       
-      expected_period_count = timeseries.length - range.end - 1
+      foreward = 5
+      expected_forecasts = timeseries.length - range.max - 1 + foreward
+      results = ema.comparison_forecast(foreward, :range => range, :model => {:period_count => 15, :interval_ratio => 5})                  
+      expect(results.length).to eq expected_forecasts
 
-      periods = 3
-      results = ema.comparison_forecast(periods, :period_count => 15, :interval_ratio => 5, :range => range)                  
-      expect(results.length).to eq expected_period_count
+      offset = range.max + 1
 
-      offset = range.end + 1      
+      # only compare forecasts against truthdata
+      # we'll have ``foreward`` extra results at the end with nothing to compare against
       results.each_with_index do |r, index|
+        # we have nothing to compare our forecasts beyond timeseries.length to, so we skip them
+        break if index+offset >= timeseries.length
+
         t = truth[offset + index ]
         diff = (r[:forecast] - t[0]).abs / t[0]
-        #expect(diff).to be <= error_tolerence     
+        expect(diff).to be <= error_tolerance
         
         diff = (r[:low] - t[1]).abs / t[1]
-        #expect(diff).to be <= error_tolerence
+        expect(diff).to be <= error_tolerance
 
         diff = (r[:high] - t[2]).abs / t[2]
-        #expect(diff).to be <= error_tolerence    
+        expect(diff).to be <= error_tolerance
       end
       
     end
