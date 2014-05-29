@@ -3,6 +3,7 @@ require 'strategy/prediction'
 require 'strategy/strategy'
 require 'strategy/exponential_moving_average_strategy'
 require 'utility/utility'
+require 'strategy/holt_winters_strategy'
 
 module UpHex
 	module Prediction
