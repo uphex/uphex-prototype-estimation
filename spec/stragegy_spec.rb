@@ -2,13 +2,12 @@ require 'spec_helper'
 require "uphex-estimation"
 
 describe UpHex::Prediction::Strategy do
-	
 	context "initialization" do
 	  it "does not accept a nil time series" do
 	    expect {described_class.new(nil).comparison_forecast}.to raise_error(ArgumentError, /Invalid timeseries/)
 	  end
   end
-	
+
   context "strategy interface" do
 	  it "throws an exception on forecast()" do
 	    expect{described_class.new(timeseries).forecast}.to raise_error(RuntimeError)
@@ -20,9 +19,9 @@ describe UpHex::Prediction::Strategy do
   end
 
   def timeseries
-    [{:date =>Date.today,:value => 100}, 
+    [
+      {:date =>Date.today,:value => 100},
       {:date =>Date.today,:value => 200}
     ]
   end
-  
 end
