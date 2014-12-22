@@ -1,23 +1,19 @@
-require 'spec_helper'
+require "spec_helper"
+
 require "uphex-estimation"
 
 describe UpHex::Prediction::ExponentialMovingAverageStrategy do
-
-
   context "exponential moving average initialization" do
-
     it "needs two or more source data rows" do
       ts = UpHex::Prediction::TimeSeries.new(single_data_set, {:days => 1})
       expect {described_class.new(ts)}.to raise_error(ArgumentError, /invalid data set length/i)
-    end            
+    end
   end
-  
 
   context "exponential moving average forecast" do
-
     let(:timeseries) { UpHex::Prediction::TimeSeries.new(sourcedata, {:days => 1})}
     let(:ema) { UpHex::Prediction::ExponentialMovingAverageStrategy.new(timeseries)}
-    
+
     let (:prng) { Random.new }
     let (:truth) { truthdata() }
 
@@ -28,31 +24,28 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
       # compute EMA on records 0..(5 to 10)
       range = Range.new(0, 5+prng.rand(5))
       results = ema.forecast(forecast_periods, :range => range,:model => { :period_count => 15, :interval_ratio => 5})
-      
+
       expect(results.length).to eq forecast_periods
       offset = range.end
 
       # only the first projected result will match the test data since the R implementation used all available data
       # comparison_forecast should match all data, including the range
-      
+
       result = results[0]
-      t0 = truth[offset] 
+      t0 = truth[offset]
 
       diff = (result[:forecast] - t0[0]).abs / t0[0]
 
       expect(diff).to be <= error_tolerance
-
     end
-    
-    it "performs a 15-day EMA with interval ratio 5 via comparison_forecast" do
-      
-      # compute EMA on records 0..(6 to 16)
 
+    it "performs a 15-day EMA with interval ratio 5 via comparison_forecast" do
+      # compute EMA on records 0..(6 to 16)
       range = 0..15
-      
+
       foreward = 5
       expected_forecasts = timeseries.length - range.max - 1 + foreward
-      results = ema.comparison_forecast(foreward, :range => range, :model => {:period_count => 15, :interval_ratio => 5})                  
+      results = ema.comparison_forecast(foreward, :range => range, :model => {:period_count => 15, :interval_ratio => 5})
       expect(results.length).to eq expected_forecasts
 
       offset = range.max + 1
@@ -66,20 +59,16 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
         t = truth[offset + index ]
         diff = (r[:forecast] - t[0]).abs / t[0]
         expect(diff).to be <= error_tolerance
-        
+
         diff = (r[:low] - t[1]).abs / t[1]
         expect(diff).to be <= error_tolerance
 
         diff = (r[:high] - t[2]).abs / t[2]
         expect(diff).to be <= error_tolerance
       end
-      
     end
-          
   end
-  
-  
-  
+
   def sourcedata
     ## taken from https://gist.github.com/fj/eaec085ac860d6c10881 results.csv
     [
@@ -113,10 +102,10 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
       {:date => Date.parse("2010-03-28"), :value => 4640},
       {:date => Date.parse("2010-03-29"), :value => 6443},
       {:date => Date.parse("2010-03-30"), :value => 6136},
-      {:date => Date.parse("2010-03-31"), :value => 5843}          
-    ]    
+      {:date => Date.parse("2010-03-31"), :value => 5843}
+    ]
   end
-  
+
   def truthdata
     ## taken from https://gist.github.com/fj/eaec085ac860d6c10881 results.csv
     ## predicted, low range, high range
@@ -152,15 +141,11 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
       [6335.710396,2221.144852,10450.27594],
       [6310.746596,2307.9339,10313.55929],
       [6252.278272,2314.67962,10189.87692]
-
     ]
   end
-  
+
   def single_data_set
     # [{:date => Date.today, :value => 1}]
     sourcedata()[0...1]
   end
-  
-  
-
 end
