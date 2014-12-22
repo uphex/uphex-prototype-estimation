@@ -67,6 +67,19 @@ describe UpHex::Prediction::ExponentialMovingAverageStrategy do
         expect(diff).to be <= error_tolerance
       end
     end
+
+    context "rounding decimal places of prediction values" do
+      let(:source)     { [
+        {date: Date.parse("2010-03-01"), value: 3.3333333333333333333333333333333},
+        {date: Date.parse("2010-03-02"), value: 4.4444444444444444444444444444444},
+      ] }
+      let(:timeseries)  { UpHex::Prediction::TimeSeries.new(source, days: 1)}
+      let(:predictions) { UpHex::Prediction::ExponentialMovingAverageStrategy.new(timeseries).comparison_forecast(1) }
+
+      it { expect(predictions.first[:forecast]).to eq 3.3394049787 }
+      it { expect(predictions.first[:low]).to eq 0.5768063145 }
+      it { expect(predictions.first[:high]).to eq 6.102003643 }
+    end
   end
 
   def sourcedata

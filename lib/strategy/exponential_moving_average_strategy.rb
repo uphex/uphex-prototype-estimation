@@ -74,7 +74,7 @@ module UpHex
           context.last_prediction = current
         end
 
-        forecasts.map {|p| {:date => p.date.to_date, :forecast => p.predicted_value, :low => p.low_range, :high => p.high_range}}
+        map_to_hash(forecasts)
       end
 
       def comparison_forecast(foreward, opts = {})
@@ -126,7 +126,20 @@ module UpHex
           context.last_prediction = current
         end
 
-        forecasts.map {|p| {:date => p.date.to_date, :forecast => p.predicted_value, :low => p.low_range, :high => p.high_range}}
+        map_to_hash(forecasts)
+      end
+
+      private
+
+      def map_to_hash(predictions)
+        predictions.map do |prediction|
+          {
+            date:     prediction.date.to_date,
+            forecast: prediction.predicted_value.round(10),
+            low:      prediction.low_range.round(10),
+            high:     prediction.high_range.round(10),
+          }
+        end
       end
     end
   end
